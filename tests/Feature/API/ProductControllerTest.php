@@ -68,4 +68,12 @@ class ProductControllerTest extends TestCase
                 ]);
         });
     }
+
+    public function test_should_product_post_endpoint_throw_an_unauthotized_status()
+    {
+        $response = $this->postJson('/api/products', []);
+        $response->assertUnauthorized();
+    }
+
+
 }
