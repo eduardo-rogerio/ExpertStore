@@ -24,11 +24,22 @@ class ProductControllerTest extends TestCase
 
         $response = $this->getJson('/api/products');
 
-        $response->assertStatus(200);
+        $response//->dd()
+        ->assertStatus(200);
 
         $response->assertJson(function (AssertableJson $json) {
             $json->count('data', 3)
                 ->etc();
+
+            $json->has('data');
+
+            $json->hasAll(['data.0.name', 'data.0.price', 'data.0.price_float']);
+
+            $json->whereAllType([
+                'data.0.name' => 'string',
+                'data.0.price' => 'string',
+                'data.0.price_float' => 'double',
+            ]);
         });
     }
 }
