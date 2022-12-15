@@ -13,8 +13,6 @@ class ProductControllerTest extends TestCase
     use RefreshDatabase;
 
     /**
-     * A basic feature test example.
-     *
      * @return void
      */
     public function test_should_product_get_endpoints_list_all_products()
@@ -40,6 +38,34 @@ class ProductControllerTest extends TestCase
                 'data.0.price' => 'string',
                 'data.0.price_float' => 'double',
             ]);
+        });
+    }
+
+    public function test_should_product_get_endpoints_returns_a_single_product()
+    {
+        Product::factory(1)
+            ->create(['name' => 'Produto 1', 'price' => 3999]);
+
+        $response = $this->getJson('/api/products/1');
+
+        $response
+            ->assertStatus(200);
+
+        $response->assertJson(function (AssertableJson $json) {
+
+            $json->count('products', 4)
+                ->has('products')
+                ->hasAll(['products.name', 'products.price', 'products.price_float'])
+                ->whereAllType([
+                    'products.name' => 'string',
+                    'products.price' => 'string',
+                    'products.price_float' => 'double',
+                ])
+                ->whereAll([
+                    'products.name' => 'Produto 1',
+                    'products.price' => '3999',
+                    'products.price_float' => 39.99,
+                ]);
         });
     }
 }
