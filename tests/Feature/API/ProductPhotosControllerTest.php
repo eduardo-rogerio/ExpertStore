@@ -20,20 +20,21 @@ class ProductPhotosControllerTest extends TestCase
      */
     public function test_should_post_product_photos_endpoint_should_save_one_photo_by_upload()
     {
+        $token = $this->makeUserToken();
+
         $product = Product::factory()
             ->create();
 
         $image = UploadedFile::fake()
             ->image('produto-foto.jpg');
 
-        $response = $this->post('/api/products/1/photos', [
-            'photos' => [
-                $image,
-            ],
-            [
+        $response = $this->post('/api/products/1/photos',
+            ['photos' => [$image],
+            ], [
+                'Accept' => 'application/json',
                 'Content-Type' => 'application/form-data',
-            ],
-        ]);
+                'Authorization' => 'Bearer ' . $token,
+            ],);
 
         Storage::disk('public')
             ->assertExists('products/' . $image->hashName());
@@ -43,6 +44,8 @@ class ProductPhotosControllerTest extends TestCase
 
     public function test_should_post_product_photos_endpoint_should_save_multiple_photo_by_upload()
     {
+        $token = $this->makeUserToken();
+
         $product = Product::factory()
             ->create();
 
@@ -55,16 +58,18 @@ class ProductPhotosControllerTest extends TestCase
         $image3 = UploadedFile::fake()
             ->image('produto-foto-3.jpg');
 
-        $response = $this->post('/api/products/1/photos', [
-            'photos' => [
-                $image,
-                $image2,
-                $image3,
+        $response = $this->post('/api/products/1/photos',
+            [
+                'photos' => [
+                    $image,
+                    $image2,
+                    $image3,
+                ],
             ],
             [
                 'Content-Type' => 'application/form-data',
-            ],
-        ]);
+                'Authorization' => 'Bearer ' . $token,
+            ],);
 
         Storage::disk('public')
             ->assertExists('products/' . $image->hashName());
@@ -84,21 +89,24 @@ class ProductPhotosControllerTest extends TestCase
 
     public function test_should_validate_uploaded_product_photos_as_image_mime_type()
     {
-        $pdf = UploadedFile::fake()
-            ->create('book.pdf', 1024, 'application/pdf');
+        $token = $this->makeUserToken();
 
         $product = Product::factory()
             ->create();
 
-        $response = $this->post('/api/products/1/photos', [
-            'photos' => [
-                $pdf,
+        $pdf = UploadedFile::fake()
+            ->create('book.pdf', 1024, 'application/pdf');
+
+        $response = $this->post('/api/products/1/photos',
+            ['photos' => [$pdf],
             ],
             [
+                'Content-Type' => 'application/form-data',
                 'Accept' => 'application/json',
+                'Connection' => 'keep-alive',
+                'Authorization' => 'Bearer ' . $token,
             ],
-        ]);
-
+        );
         $response->assertUnprocessable();
 
         $response->assertJson(function (AssertableJson $json) {
@@ -107,5 +115,18 @@ class ProductPhotosControllerTest extends TestCase
         });
 
         $response->assertJsonValidationErrorFor('photos.0');
+
+        $this->assertEquals('Arquivo de imagem inválido!', $response->json('errors')['photos.0'][0]);
+
+    }
+
+    public function test_should_product_photos_post_endpoint_throw_an_unauthotized_status()
+    {
+        Product::factory()
+            ->create();
+
+        $response = $this->postJson('/api/products/1/photos', []);
+
+        $response->assertUnauthorized();
     }
 }

@@ -77,9 +77,7 @@ class ProductControllerTest extends TestCase
 
     public function test_should_validate_payload_data_when_create_a_new_product()
     {
-        $token = User::factory()
-            ->create();
-        $token = $token->createToken('default')->plainTextToken;
+        $token = $this->makeUserToken();
 
         $response = $this->postJson('/api/products', [], ['Authorization' => 'Bearer ' . $token]);
 
@@ -104,9 +102,7 @@ class ProductControllerTest extends TestCase
             'price' => 3999,
         ];
 
-        $token = User::factory()
-            ->create();
-        $token = $token->createToken('default')->plainTextToken;
+        $token = $this->makeUserToken();
 
         $response = $this->postJson('/api/products', $product, ['Authorization' => 'Bearer ' . $token]);
 
@@ -183,9 +179,7 @@ class ProductControllerTest extends TestCase
             'price' => 1999,
         ];
 
-        $token = User::factory()
-            ->create();
-        $token = $token->createToken('default')->plainTextToken;
+        $token = $this->makeUserToken();
 
         $response = $this->putJson('/api/products/1', $productUpdateData, ['Authorization' => 'Bearer ' . $token]);
 
@@ -226,9 +220,7 @@ class ProductControllerTest extends TestCase
             ->create(['name' => 'Produto Delete',
                 'price' => 4999,]);
 
-        $token = User::factory()
-            ->create();
-        $token = $token->createToken('default')->plainTextToken;
+        $token = $this->makeUserToken();
 
         $response = $this->deleteJson('/api/products/1', [], ['Authorization' => 'Bearer ' . $token]);
 

@@ -18,7 +18,7 @@ class ProductPhotosController extends Controller
             $photos[] = ['photo' => $file->store('products', 'public')];
         }
 
-        $product->photos()
+        return $product->photos()
             ->createMany($photos);
     }
 }
