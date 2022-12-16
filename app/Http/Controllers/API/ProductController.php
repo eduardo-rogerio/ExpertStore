@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\API\ProductStoreRequest;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
@@ -27,9 +28,11 @@ class ProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(ProductStoreRequest $request)
     {
-        if(!$request->user()->tokenCan('store')) abort(401,'Unauthorized');
+        if (! $request->user()
+            ->tokenCan('store')) abort(401, 'Unauthorized');
+
         return new ProductResource(\App\Models\Product::create($request->all()));
     }
 

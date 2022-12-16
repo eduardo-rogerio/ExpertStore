@@ -75,6 +75,27 @@ class ProductControllerTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function test_should_validate_payload_data_when_a_new_product()
+    {
+        $token = User::factory()
+            ->create();
+        $token = $token->createToken('default')->plainTextToken;
+
+        $response = $this->postJson('/api/products', [], ['Authorization' => 'Bearer ' . $token]);
+
+        $response->assertUnprocessable();
+
+        $response->assertJson(function (AssertableJson $json) {
+
+            $json->hasAll(['message', 'errors'])
+                ->hasAll(['errors.name', 'errors.price'])
+                ->whereAll([
+                    'errors.name.0' => 'Campo obrigatório!',
+                    'errors.price.0' => 'Campo obrigatório!',
+                ]);
+        });
+    }
+
     public function test_should_product_post_endpoint_create_a_new_product()
     {
         $product = [
