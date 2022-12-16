@@ -30,7 +30,7 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         if(!$request->user()->tokenCan('store')) abort(401,'Unauthorized');
-        return \App\Models\Product::create($request->all());
+        return new ProductResource(\App\Models\Product::create($request->all()));
     }
 
     /**

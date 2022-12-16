@@ -3,6 +3,7 @@
 namespace Tests\Feature\API;
 
 use App\Models\Product;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Testing\Fluent\AssertableJson;
@@ -75,5 +76,39 @@ class ProductControllerTest extends TestCase
         $response->assertUnauthorized();
     }
 
+    public function test_should_product_post_endpoint_create_a_new_product()
+    {
+        $product = [
+            'name' => 'Produto Teste',
+            'description' => 'Descrição Teste',
+            'price' => 3999,
+        ];
+
+        $token = User::factory()
+            ->create();
+        $token = $token->createToken('default')->plainTextToken;
+
+        $response = $this->postJson('/api/products', $product, ['Authorization' => 'Bearer ' . $token]);
+
+        $response->assertCreated();
+
+        $response->assertJson(function (AssertableJson $json) {
+
+            $json->count('products', 3)
+                ->has('products')
+                ->hasAll(['products.name', 'products.price', 'products.price_float'])
+                ->whereAllType([
+                    'products.name' => 'string',
+                    'products.price' => 'integer',
+                    'products.price_float' => 'double',
+                ])
+                ->whereAll([
+                    'products.name' => 'Produto Teste',
+                    'products.price' => 3999,
+                    'products.price_float' => 39.99,
+                ]);
+        });
+
+    }
 
 }
