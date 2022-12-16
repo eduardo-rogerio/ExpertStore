@@ -57,7 +57,7 @@ class ProductController extends Controller
 
         $product->update($request->all());
 
-        return $product;
+        return new ProductResource($product);
     }
 
     /**
@@ -69,6 +69,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return $product->name;
+
+        return response()->json([], 204);
     }
 }
