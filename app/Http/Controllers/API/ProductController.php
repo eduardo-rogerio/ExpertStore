@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\API\ProductPutRequest;
 use App\Http\Requests\API\ProductStoreRequest;
 use App\Http\Resources\ProductCollection;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
-use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
@@ -54,9 +54,10 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(ProductPutRequest $request, Product $product)
     {
-        if(!$request->user()->tokenCan('store')) abort(401,'Unauthorized');
+        if (! $request->user()
+            ->tokenCan('store')) abort(401, 'Unauthorized');
 
         $product->update($request->all());
 
