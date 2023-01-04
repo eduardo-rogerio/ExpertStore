@@ -11,7 +11,7 @@ class ProductPhotosController extends Controller
 
     public function index(Product $product)
     {
-        return response()->json(['data' => $product->photos()]);
+        return response()->json(['data' => $product->photos]);
     }
 
     public function store(Product $product, ProductPhotosStoreRequest $request)

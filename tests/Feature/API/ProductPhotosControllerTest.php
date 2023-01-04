@@ -137,17 +137,25 @@ class ProductPhotosControllerTest extends TestCase
             ->create();
 
         ProductPhoto::factory(3)
-            ->createMany([
+            ->sequence(
                 ['photo' => 'image1.jpg', 'product_id' => $product->id],
-                ['photo' => 'image1.jpg', 'product_id' => $product->id],
-                ['photo' => 'image1.jpg', 'product_id' => $product->id],
-            ]);
+                ['photo' => 'image2.jpg', 'product_id' => $product->id],
+                ['photo' => 'image3.jpg', 'product_id' => $product->id],
+            )
+            ->create();
 
         $token = $this->makeUserToken();
 
         $response = $this->getJson('/api/products/1/photos', ['Authorization' => 'Bearer ' . $token]);
 
-        $response->assertJson(fn(AssertableJson $json) => $json->count('data', 3));
+        $response->assertJson(fn(AssertableJson $json) => $json
+            ->whereAll([
+                'data.0.photo' => 'image1.jpg',
+                'data.1.photo' => 'image2.jpg',
+                'data.2.photo' => 'image3.jpg',
+            ])
+            ->count('data', 3)
+            ->etc());
 
     }
 }
