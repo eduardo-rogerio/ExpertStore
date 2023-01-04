@@ -19,7 +19,7 @@ class ProductController extends Controller
      */
     public function index(Product $product)
     {
-        return new ProductCollection($this->product->all());
+        return new ProductCollection($this->product->paginate(10));
     }
 
     /**

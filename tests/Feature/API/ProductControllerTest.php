@@ -22,8 +22,8 @@ class ProductControllerTest extends TestCase
 
         $response = $this->getJson('/api/products');
 
-        $response//->dd()
-        ->assertStatus(200);
+        $response
+            ->assertStatus(200);
 
         $response->assertJson(function (AssertableJson $json) {
             $json->count('data', 3)
@@ -41,6 +41,28 @@ class ProductControllerTest extends TestCase
         });
     }
 
+    public function test_should_product_get_endpoints_list_all_products_paginated()
+    {
+        Product::factory(20)
+            ->create();
+
+        $response = $this->getJson('/api/products');
+
+        $response->assertStatus(200);
+
+        $response->assertJson(fn(AssertableJson $json) => $json->where('data.0.id', 1)
+            ->where('data.9.id', 10)
+            ->count('data', 10)
+            ->etc());
+
+        $response = $this->getJson('/api/products?page=2');
+        $response->assertStatus(200);
+        $response->assertJson(fn(AssertableJson $json) => $json->where('data.0.id', 11)
+            ->where('data.9.id', 20)
+            ->count('data', 10)
+            ->etc());
+    }
+
     public function test_should_product_get_endpoints_returns_a_single_product()
     {
         Product::factory(1)
@@ -53,7 +75,7 @@ class ProductControllerTest extends TestCase
 
         $response->assertJson(function (AssertableJson $json) {
 
-            $json->count('products', 4)
+            $json->count('products', 5)
                 ->has('products')
                 ->hasAll(['products.name', 'products.price', 'products.price_float'])
                 ->whereAllType([
@@ -110,7 +132,7 @@ class ProductControllerTest extends TestCase
 
         $response->assertJson(function (AssertableJson $json) {
 
-            $json->count('products', 3)
+            $json->count('products', 4)
                 ->has('products')
                 ->hasAll(['products.name', 'products.price', 'products.price_float'])
                 ->whereAllType([
@@ -187,7 +209,7 @@ class ProductControllerTest extends TestCase
 
         $response->assertJson(function (AssertableJson $json) {
 
-            $json->count('products', 4)
+            $json->count('products', 5)
                 ->has('products')
                 ->hasAll(['products.name', 'products.price', 'products.price_float'])
                 ->whereAllType([
