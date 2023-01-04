@@ -20,6 +20,7 @@ class ProductResource extends JsonResource
             'price' => $this->price,
             'price_float' => $this->price_float,
             'categories' => $this->whenLoaded('categories'),
+            'photos' => $this->whenLoaded('photos'),
         ];
     }
 }

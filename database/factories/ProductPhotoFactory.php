@@ -17,7 +17,8 @@ class ProductPhotoFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'photo' => $this->faker->imageUrl,
+            'is_thumb' => false,
         ];
     }
 }

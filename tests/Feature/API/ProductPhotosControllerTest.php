@@ -3,6 +3,7 @@
 namespace Tests\Feature\API;
 
 use App\Models\Product;
+use App\Models\ProductPhoto;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -128,5 +129,25 @@ class ProductPhotosControllerTest extends TestCase
         $response = $this->postJson('/api/products/1/photos', []);
 
         $response->assertUnauthorized();
+    }
+
+    public function test_should_product_photos_get_endpoint_returns_product_photos()
+    {
+        $product = Product::factory()
+            ->create();
+
+        ProductPhoto::factory(3)
+            ->createMany([
+                ['photo' => 'image1.jpg', 'product_id' => $product->id],
+                ['photo' => 'image1.jpg', 'product_id' => $product->id],
+                ['photo' => 'image1.jpg', 'product_id' => $product->id],
+            ]);
+
+        $token = $this->makeUserToken();
+
+        $response = $this->getJson('/api/products/1/photos', ['Authorization' => 'Bearer ' . $token]);
+
+        $response->assertJson(fn(AssertableJson $json) => $json->count('data', 3));
+
     }
 }
