@@ -158,4 +158,34 @@ class ProductPhotosControllerTest extends TestCase
             ->etc());
 
     }
+
+    public function test_should_product_photos_delete_endpoint_remove_a_photo()
+    {
+
+        $product = Product::factory()
+            ->create();
+
+        $image = UploadedFile::fake()
+            ->image('image.jpg');
+
+        $token = $this->makeUserToken();
+
+        $this->postJson('/api/products/1/photos', ['photos' => [$image]],
+            [
+                'Content-Type' => 'application/form-data',
+                'Authorization' => 'Bearer ' . $token,
+            ]);
+
+        $response = $this->deleteJson('api/products/1/photos/1', [],
+            [
+                'Authorization' => 'Bearer ' . $token,
+            ]);
+
+        $response->assertNoContent();
+
+        Storage::disk('public')
+            ->assertMissing('products/' . $image->hashName());
+
+        $this->assertCount(0, $product->photos);
+    }
 }

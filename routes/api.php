@@ -30,7 +30,7 @@ Route::apiResource('products.categories', \App\Http\Controllers\API\ProductCateg
     ->only('index');
 
 Route::apiResource('products.photos', \App\Http\Controllers\API\ProductPhotosController::class)
-    ->only(['index', 'store'])
+    ->only(['index', 'store', 'destroy'])
     ->middleware('auth:sanctum');
 
 Route::post('/login', [\App\Http\Controllers\API\AuthController::class, 'login']);

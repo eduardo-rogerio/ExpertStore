@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\API\ProductPhotosStoreRequest;
 use App\Models\Product;
+use Illuminate\Support\Facades\Storage;
 
 class ProductPhotosController extends Controller
 {
@@ -26,5 +27,20 @@ class ProductPhotosController extends Controller
 
         return $product->photos()
             ->createMany($photos);
+    }
+
+    public function destroy(Product $product, $photo)
+    {
+        $productPhoto = $product->photos()
+            ->find($photo);
+
+        if (Storage::disk('public')
+            ->exists($productPhoto->photo))
+            Storage::disk('public')
+                ->delete($productPhoto->photo);
+
+        $productPhoto->delete();
+
+        return response()->json([], 204);
     }
 }
